@@ -240,8 +240,6 @@ async function status(orderid) {
     }
 
     const result = await axios.post(url, data);
-
-    // console.log(result.data)
     return result.data;
 }
 
@@ -285,7 +283,7 @@ async function sell(pricetosell) {
 }
 
 module.exports = {
-    isOpened
+    isOpened, balance
 }
 
 

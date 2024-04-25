@@ -9,11 +9,13 @@ const chatid = process.env.TELEGRAN_CHAT_ID
 // cria um menu com os comandos no chat do telegran
 bot.telegram.setMyCommands([
     { command: 'start', description: 'inicia conversa com o bot' },
+    { command: 'balance', description: 'Verifica o saldo da conta' },
 ]);
 
 //constante para o comando do help com a lista de comandos slash
 const helpmessage = `
   Comandos do bot:
+  /balance  Verifica o saldo da conta
 `;
 
 // comando start, envia uma mensagem em privato
@@ -41,5 +43,27 @@ bot.help((ctx) => {
 bot.command('status', ctx => {
     ctx.reply(`Is Opened? ${app.isOpened}`);
 });
+
+bot.command('balance', ctx => {
+    getBalance()
+});
+
+async function getBalance() {
+    const balance = await app.balance()
+
+    if (balance.success == true){
+        bot.telegram.sendMessage(chatid, `
+        BTC: ${balance.BTC},
+        BRL: ${balance.BRL},
+        ToBuy: ${balance.ToBuy},
+        ToSell: ${balance.ToSell}`)
+    }else{
+        bot.telegram.sendMessage(chatid, `Erro ao verificar o saldo`)
+    }
+   
+}
+
+success: true,
+
 
 bot.launch();
