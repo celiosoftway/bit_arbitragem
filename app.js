@@ -13,7 +13,6 @@ let orderexe = 0
 let id_buy = 0
 let id_sell = 0
 
-
 let time1 = new Date()
 let time2 = new Date()
 
@@ -43,7 +42,7 @@ channel.join()
 
 
 channel.on('price', payload => {
-    console.clear();
+   // console.clear();
 
     const coinPair = payload[COINPAIR];
     console.log(`--`);
@@ -71,8 +70,9 @@ channel.on('price', payload => {
 
     console.log(`Tempo: ${parseFloat(tempo).toFixed(2)}`)
     let dif = Math.abs(data.var)
+    let dif2 = parseFloat(data.sell - data.buy).toFixed(0)
 
-    if (dif > 2 && !isOpened && tempo > 2) {
+    if ((dif > 2) && (!isOpened) && (tempo > 2) && (dif2 > 1000)) {
         buyprice = data.buy + 200;
         sellprice = data.sell - 200;
 
@@ -84,7 +84,7 @@ channel.on('price', payload => {
         order();
     }
 
-    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell} Variação ${dif}, Dif :${parseFloat(data.sell - data.buy).toFixed(0)}` );
+    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell} Variação ${dif}, Dif :${dif2}` );
 })
 // stream fim
 
@@ -282,6 +282,10 @@ async function sell(pricetosell) {
 
 
     return result.data;
+}
+
+module.exports = {
+    isOpened
 }
 
 
