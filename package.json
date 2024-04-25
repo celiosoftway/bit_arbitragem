@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.1.0",
+    "phoenix-channels": "^1.0.0",
+    "telegraf": "^4.16.3"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+}
