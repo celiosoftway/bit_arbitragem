@@ -3,16 +3,17 @@ const axios = require("axios");
 
 const url_balance = `https://api.bitpreco.com/v1/trading/balance`;
 
-let amountToBuy = 0;
-let amountToSell = 0;
-let buyprice = 0;
-let sellprice = 0;
-let isOpened = false;
-let isStartd = false;
-let orderexe = 0
-let id_buy = 0
-let id_sell = 0
+let amountToBuy = 0;  // valor para usar na compra
+let amountToSell = 0; // valor para usar na venda
+let buyprice = 0;     // valor de compra
+let sellprice = 0;    // valor de venda
+let isOpened = false; // verifica se a arbitragem esta em aberto (efetuar as duas operações)
+let isStartd = false; // verifica se é a primeira intereção na rotina
+let orderexe = 0      // numero de ordens executadas
+let id_buy = 0        // id da ultima ordem de compra
+let id_sell = 0       // id da ultima ordem de venda
 
+// variaveis para controlar o intervalo de execução
 let time1 = new Date()
 let time2 = new Date()
 
@@ -42,7 +43,7 @@ channel.join()
 
 
 channel.on('price', payload => {
-   // console.clear();
+    console.clear();
 
     const coinPair = payload[COINPAIR];
     console.log(`--`);
@@ -280,10 +281,6 @@ async function sell(pricetosell) {
 
 
     return result.data;
-}
-
-module.exports = {
-    isOpened, balance
 }
 
 
