@@ -3,17 +3,17 @@ const axios = require("axios");
 
 const url_balance = `https://api.bitpreco.com/v1/trading/balance`;
 
-let amountToBuy = 0;
-let amountToSell = 0;
-let buyprice = 0;
-let sellprice = 0;
-let isOpened = false;
-let isStartd = false;
-let orderexe = 0
-let id_buy = 0
-let id_sell = 0
+let amountToBuy = 0;  // valor para usar na compra
+let amountToSell = 0; // valor para usar na venda
+let buyprice = 0;     // valor de compra
+let sellprice = 0;    // valor de venda
+let isOpened = false; // verifica se a arbitragem esta em aberto (efetuar as duas operações)
+let isStartd = false; // verifica se é a primeira intereção na rotina
+let orderexe = 0      // numero de ordens executadas
+let id_buy = 0        // id da ultima ordem de compra
+let id_sell = 0       // id da ultima ordem de venda
 
-
+// variaveis para controlar o intervalo de execução
 let time1 = new Date()
 let time2 = new Date()
 
@@ -70,21 +70,20 @@ channel.on('price', payload => {
     }
 
     console.log(`Tempo: ${parseFloat(tempo).toFixed(2)}`)
-    let dif = Math.abs(data.var)
+    //let dif = Math.abs(data.var)
+    let spread = parseFloat(data.sell - data.buy).toFixed(0)
 
-    if (dif > 2 && !isOpened && tempo > 2) {
+    if ((spread > 1000) && (!isOpened) && (tempo > 2)) {
+
         buyprice = data.buy + 200;
         sellprice = data.sell - 200;
-
-        buyprice = parseFloat(buyprice).toFixed(0)
-        sellprice = parseFloat(sellprice).toFixed(0)
 
         time1 = new Date()
         orderexe = orderexe + 1
         order();
     }
 
-    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell} Variação ${dif}, Dif :${parseFloat(data.sell - data.buy).toFixed(0)}` );
+    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell}, Spread :${spread}`);
 })
 // stream fim
 
@@ -136,19 +135,19 @@ async function fechaordem(idcompra, idvenda) {
         await timer(30000)
 
         result = await status(idcompra)
-        if(result.success == true){
+        if (result.success == true) {
             console.log(`Ordem de compra id ${idcompra}: ${result.order.status}`)
 
             if (result.order.status == 'FILLED') {
                 isfinish = true;
             }
-        }else {
+        } else {
             console.log(`Ordem de compra id ${idcompra}: ${result.message_cod}`)
             isfinish = true;
         }
 
         result = await status(idvenda)
-        if(result.success == true){
+        if (result.success == true) {
             console.log(`Ordem de venda id ${idvenda}: ${result.order.status}`)
 
             if (result.order.status == 'FILLED' && isfinish) {
@@ -156,7 +155,7 @@ async function fechaordem(idcompra, idvenda) {
             } else {
                 isfinish = false;
             }
-        }else {
+        } else {
             console.log(`Ordem de compra id ${idcompra}: ${result.message_cod}`)
         }
     }
@@ -240,8 +239,6 @@ async function status(orderid) {
     }
 
     const result = await axios.post(url, data);
-
-    // console.log(result.data)
     return result.data;
 }
 
