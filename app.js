@@ -70,10 +70,10 @@ channel.on('price', payload => {
     }
 
     console.log(`Tempo: ${parseFloat(tempo).toFixed(2)}`)
-    let dif = Math.abs(data.var)
-    let dif2 = parseFloat(data.sell - data.buy).toFixed(0)
+    //let dif = Math.abs(data.var)
+    let spread = parseFloat(data.sell - data.buy).toFixed(0)
 
-    if (((dif > 3) || (dif2 > 1000)) && (!isOpened) && (tempo > 2)) {
+    if ((spread > 1000) && (!isOpened) && (tempo > 2)) {
 
         buyprice = data.buy + 200;
         sellprice = data.sell - 200;
