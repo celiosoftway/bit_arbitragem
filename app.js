@@ -83,7 +83,7 @@ channel.on('price', payload => {
         order();
     }
 
-    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell} Variação ${dif}, Spread :${dif2}`);
+    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell}, Spread :${spread}`);
 })
 // stream fim
 
