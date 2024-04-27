@@ -11,7 +11,8 @@ const COINPAIR = process.env.COINPAIR;
 let buyprice = 0;
 let sellprice = 0;
 let variacao = 0
-let diferenca = 0
+let bid = 0
+let ask = 0
 
 // stream
 const { Socket } = require('phoenix-channels')
@@ -24,28 +25,30 @@ socket.onError(e => {
     process.exit(0);
 })
 
-const channel = socket.channel(`ticker:ALL-BRL`, {});
-channel.join()
+const ch_ticker = socket.channel(`ticker:ALL-BRL`, {});
+ch_ticker.join()
     .receive('ok', resp => console.log('Joined successfully', resp))
     .receive('error', resp => console.log('Unable to join', resp))
 
-channel.on('price', payload => {
-    //  console.clear();
+ch_ticker.on('price', payload => {
     const coinPair = payload[COINPAIR];
-
-    var data = {
-        buy: coinPair.buy,
-        sell: coinPair.sell,
-        var: coinPair.var
-    }
-
-    buyprice = parseFloat(data.buy).toFixed(0);
-    sellprice = parseFloat(data.sell).toFixed(0);
-    variacao = data.var
-    diferenca = sellprice - buyprice
-
-    //  console.log(`preço de compra: ${buyprice},\npreço de venda: ${sellprice},\nvariação: ${data.var},\nDif :${parseFloat(sellprice -buyprice).toFixed(0)}` );
+    buyprice = parseFloat(coinPair.buy).toFixed(0);
+    sellprice = parseFloat(coinPair.sell).toFixed(0);
+    variacao = coinPair.var
 })
+
+const ch_orderbook = socket.channel(`orderbook:${COINPAIR}`, {})
+ch_orderbook.join()
+    .receive('ok', resp => { console.log('Joined successfully', resp); })
+    .receive('error', resp => { console.log('Unable to join', resp); })
+
+ch_orderbook.on('snapshot', payload => {
+    ask = payload.asks[0].price
+    bid =  payload.bids[0].price
+
+    ask = parseFloat(ask).toFixed(0);
+    bid = parseFloat(bid).toFixed(0);
+}) 
 // stream fim
 
 // cria um menu com os comandos no chat do telegran
@@ -103,6 +106,7 @@ async function getBalance() {
 
     if (dados.success == true) {
         bot.telegram.sendMessage(chatid, `
+        ---
         BTC: ${dados.BTC},
         BRL: ${dados.BRL},
         ToBuy: ${dados.ToBuy},
@@ -116,12 +120,16 @@ async function getBalance() {
 
 bot.command('mercado', ctx => {
     bot.telegram.sendMessage(chatid, `
-    preço de compra: ${buyprice}, 
+    ---
     preço de venda: ${sellprice}, 
+    preço de compra: ${buyprice}, 
     Variação ${variacao}, 
-    Dif :${diferenca}
+    Spread :${sellprice - buyprice}
+    ---
+    Asks - oferta de venda:${ask}
+    Bids - oferta de compra:${bid}
+    Spread:${ask - bid}
+    ---
     `)
 });
-
-
 bot.launch();

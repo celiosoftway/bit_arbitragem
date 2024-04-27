@@ -73,19 +73,17 @@ channel.on('price', payload => {
     let dif = Math.abs(data.var)
     let dif2 = parseFloat(data.sell - data.buy).toFixed(0)
 
-    if ((dif > 2) && (!isOpened) && (tempo > 2) && (dif2 > 1000)) {
+    if (((dif > 3) || (dif2 > 1000)) && (!isOpened) && (tempo > 2)) {
+
         buyprice = data.buy + 200;
         sellprice = data.sell - 200;
-
-        buyprice = parseFloat(buyprice).toFixed(0)
-        sellprice = parseFloat(sellprice).toFixed(0)
 
         time1 = new Date()
         orderexe = orderexe + 1
         order();
     }
 
-    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell} Variação ${dif}, Dif :${dif2}` );
+    console.log(`preço de compra: ${data.buy}, preço de venda: ${data.sell} Variação ${dif}, Spread :${dif2}`);
 })
 // stream fim
 
@@ -137,19 +135,19 @@ async function fechaordem(idcompra, idvenda) {
         await timer(30000)
 
         result = await status(idcompra)
-        if(result.success == true){
+        if (result.success == true) {
             console.log(`Ordem de compra id ${idcompra}: ${result.order.status}`)
 
             if (result.order.status == 'FILLED') {
                 isfinish = true;
             }
-        }else {
+        } else {
             console.log(`Ordem de compra id ${idcompra}: ${result.message_cod}`)
             isfinish = true;
         }
 
         result = await status(idvenda)
-        if(result.success == true){
+        if (result.success == true) {
             console.log(`Ordem de venda id ${idvenda}: ${result.order.status}`)
 
             if (result.order.status == 'FILLED' && isfinish) {
@@ -157,7 +155,7 @@ async function fechaordem(idcompra, idvenda) {
             } else {
                 isfinish = false;
             }
-        }else {
+        } else {
             console.log(`Ordem de compra id ${idcompra}: ${result.message_cod}`)
         }
     }
